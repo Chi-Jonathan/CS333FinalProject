@@ -1,23 +1,25 @@
 version: 2.1
 
-# Define the jobs we want to run for this project
 jobs:
   build:
+    working_directory: ~/circleci-python
     docker:
-      - image: cimg/base:2023.03
+      - image: "circleci/python:3.10"
     steps:
       - checkout
-      - run: echo "this is the build job"
+      - run: python3 main.py
   test:
+    working_directory: ~/circleci-python
     docker:
-      - image: cimg/base:2023.03
+      - image: "circleci/python:3.10"
     steps:
       - checkout
-      - run: echo "this is the test job"
+      - run: python3 test.py
 
-# Orchestrate our job run sequence
 workflows:
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
