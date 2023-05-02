@@ -8,7 +8,7 @@ import random
 # num_attackers = int(input("Input the amount of attackers you want (should be less than number of branches): "))
 # print()
 
-probability = 0.2
+probability = 0.4
 rate = 10
 method = 1
 net = 4
