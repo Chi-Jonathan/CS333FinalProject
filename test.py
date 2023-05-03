@@ -64,6 +64,36 @@ class integration_test_sampling_algorithms(unittest.TestCase):
         self.rate=10
         self.attackers_route_node=["U2","R15","R12","R9","R6","R3","R2","R1"]
         self.attackers_route_edge=['U2 | R15', 'R15 | R12', 'R12 | R9', 'R9 | R6', 'R6 | R3', 'R3 | R2', 'R2 | R1', 'R1 | V']
-
+    
+    def test_build_test_network(self):
+        self.assertEqual(main.build_network(main.get_network("branch3.txt")), self.graph)
+        
+    def test_build_test_network_node_sampling(self):
+        packets_marked, packets_sent = main.node_sampling(main.build_network(main.get_network("branch3.txt")), self.attackers, self.users, self.probability, self.rate)
+        packets_marked = sorted(packets_marked.items(), key=lambda x:x[1])
+        p_route=[]
+        for n in range(12,len(packets_marked)):
+            p_route.append(packets_marked[n][0])
+        self.assertEqual(p_route, self.attackers_route_node)
+        p_sent=0
+        for packet in packets_marked:
+            p_sent+=packet[1]
+        self.assertTrue(p_sent<=packets_sent)
+        
+    def test_build_test_network_edge_sampling(self):
+        packets_marked, packets_sent, users_costs, attackers_costs = main.edge_sampling(main.build_network(main.get_network("branch3.txt")), self.attackers, self.users, self.probability, self.rate)
+        packets_marked = sorted(packets_marked.items(), key=lambda x:x[1])
+        p_route=[]
+        for n in range(12,len(packets_marked)):
+            p_route.append(packets_marked[n][0])
+        self.assertEqual(p_route, self.attackers_route_edge)
+        p_sent=0
+        for packet in packets_marked:
+            p_sent+=packet[1]
+        self.assertTrue(p_sent<=packets_sent)
+        self.assertTrue(attackers_costs["U2 | R15"]>users_costs["U1 | R14"])
+        self.assertTrue(attackers_costs["U2 | R15"]>users_costs["U3 | R17"])
+        
+        
 if __name__ == '__main__':
     unittest.main()
